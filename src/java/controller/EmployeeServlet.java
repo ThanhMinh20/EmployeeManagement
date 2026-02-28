@@ -4,84 +4,162 @@
  */
 package controller;
 
-import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+import java.util.List;
+import model.Employee;
+import service.EmployeeService;
+import service.IEmployeeService;
 
-/**
- *
- * @author minht
- */
-@WebServlet(name = "EmployeeServlet", urlPatterns = {"/EmployeeServlet"})
+@WebServlet(name = "EmployeeServlet", urlPatterns = {"/employee"})
 public class EmployeeServlet extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+    private IEmployeeService service = new EmployeeService();
+
+    protected void processRequest(HttpServletRequest request,
+            HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet EmployeeServlet</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet EmployeeServlet at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+
+        String action = request.getParameter("action");
+
+        if (action == null) {
+            action = "list";
+        }
+
+        try {
+
+            switch (action) {
+
+                // ================= LIST =================
+                case "list":
+                    List<Employee> list = service.getAllEmployees();
+                    request.setAttribute("EMP_LIST", list);
+                    request.getRequestDispatcher("employees/list.jsp")
+                            .forward(request, response);
+                    break;
+
+                // ================= CREATE =================
+                case "create":
+                    createEmployee(request, response);
+                    break;
+
+                // ================= UPDATE =================
+                case "update":
+                    updateEmployee(request, response);
+                    break;
+
+                // ================= DELETE =================
+                case "delete":
+                    int id = Integer.parseInt(request.getParameter("id"));
+                    service.deleteEmployee(id);
+                    response.sendRedirect("employee?action=list");
+                    break;
+
+                // ================= CHANGE STATUS =================
+                case "changeStatus":
+                    int empId = Integer.parseInt(request.getParameter("id"));
+                    String status = request.getParameter("status");
+                    service.changeStatus(empId, status);
+                    response.sendRedirect("employee?action=list");
+                    break;
+
+                // ================= MODULE 6 =================
+                case "addTemp":
+                    addTempEmployee(request, response);
+                    break;
+
+                case "confirmInsert":
+                    confirmInsert(request, response);
+                    break;
+
+                default:
+                    response.sendRedirect("employee?action=list");
+            }
+
+        } catch (Exception e) {
+            request.setAttribute("ERROR", e.getMessage());
+            request.getRequestDispatcher("error.jsp")
+                    .forward(request, response);
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    // ================= CREATE =================
+    private void createEmployee(HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+
+        Employee e = extractEmployeeFromRequest(request);
+
+        service.createEmployee(e);
+
+        response.sendRedirect("employee?action=list");
+    }
+
+    // ================= UPDATE =================
+    private void updateEmployee(HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+
+        Employee e = extractEmployeeFromRequest(request);
+
+        service.updateEmployee(e);
+
+        response.sendRedirect("employee?action=list");
+    }
+
+    // ================= MODULE 6 =================
+    private void addTempEmployee(HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+
+        Employee e = extractEmployeeFromRequest(request);
+
+        HttpSession session = request.getSession();
+
+        service.addTempEmployee(session, e);
+
+        response.sendRedirect("employees/tempList.jsp");
+    }
+
+    private void confirmInsert(HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+
+        HttpSession session = request.getSession();
+
+        service.confirmInsert(session);
+
+        response.sendRedirect("employee?action=list");
+    }
+
+    // ================= COMMON METHOD =================
+    private Employee extractEmployeeFromRequest(HttpServletRequest request) {
+
+        int id = Integer.parseInt(request.getParameter("id"));
+        String name = request.getParameter("name");
+        double salary = Double.parseDouble(request.getParameter("salary"));
+        int departmentId = Integer.parseInt(request.getParameter("departmentId"));
+        String status = request.getParameter("status");
+
+        Employee e = new Employee();
+        e.setId(id);
+        e.setName(name);
+        e.setSalary(salary);
+        e.setDepartmentId(departmentId);
+        e.setStatus(status);
+
+        return e;
+    }
+
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void doGet(HttpServletRequest request,
+            HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void doPost(HttpServletRequest request,
+            HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
-
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
 }

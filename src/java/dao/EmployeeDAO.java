@@ -9,47 +9,45 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import model.Employee;
 
 public class EmployeeDAO {
 
-    // 1️⃣ Lấy tất cả nhân viên
+    // ================= MODULE 1 =================
+
     public List<Employee> getAllEmployees() {
         List<Employee> list = new ArrayList<>();
-        String sql = "SELECT * FROM Employees";
+        String sql = "SELECT id, name, salary, departmentId, status, hireDate FROM Employees";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                Employee emp = new Employee(
+                Employee e = new Employee(
                         rs.getInt("id"),
-                        rs.getString("fullName"),
-                        rs.getString("email"),
-                        rs.getString("phone"),
-                        rs.getString("department"),
-                        rs.getString("position"),
+                        rs.getString("name"),
                         rs.getDouble("salary"),
+                        rs.getInt("departmentId"),
                         rs.getString("status"),
-                        rs.getTimestamp("createdDate")
+                        rs.getDate("hireDate")
                 );
-                list.add(emp);
+                list.add(e);
             }
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return list;
     }
 
-    // 2️⃣ Lấy nhân viên theo ID
     public Employee getEmpById(int id) {
-        String sql = "SELECT * FROM Employees WHERE id = ?";
-        
+        String sql = "SELECT id, name, salary, departmentId, status, hireDate FROM Employees WHERE id = ?";
+
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -59,94 +57,141 @@ public class EmployeeDAO {
             if (rs.next()) {
                 return new Employee(
                         rs.getInt("id"),
-                        rs.getString("fullName"),
-                        rs.getString("email"),
-                        rs.getString("phone"),
-                        rs.getString("department"),
-                        rs.getString("position"),
+                        rs.getString("name"),
                         rs.getDouble("salary"),
+                        rs.getInt("departmentId"),
                         rs.getString("status"),
-                        rs.getTimestamp("createdDate")
+                        rs.getDate("hireDate")
                 );
             }
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return null;
     }
 
-    // 3️⃣ Tìm theo tên
-    public List<Employee> searchByName(String name) {
-        List<Employee> list = new ArrayList<>();
-        String sql = "SELECT * FROM Employees WHERE fullName LIKE ?";
+    public boolean insertEmp(Employee e) {
+        String sql = "INSERT INTO Employees (name, salary, departmentId, status, hireDate) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, "%" + name + "%");
+            ps.setString(1, e.getName());
+            ps.setDouble(2, e.getSalary());
+            ps.setInt(3, e.getDepartmentId());
+            ps.setString(4, e.getStatus());
+            ps.setDate(5, e.getHireDate());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public boolean updateEmp(Employee e) {
+        String sql = "UPDATE Employees SET name = ?, salary = ?, departmentId = ?, status = ?, hireDate = ? WHERE id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, e.getName());
+            ps.setDouble(2, e.getSalary());
+            ps.setInt(3, e.getDepartmentId());
+            ps.setString(4, e.getStatus());
+            ps.setDate(5, e.getHireDate());
+            ps.setInt(6, e.getId());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public boolean deleteEmp(int id) {
+        String sql = "DELETE FROM Employees WHERE id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    // ================= MODULE 5 =================
+
+    public List<Employee> searchByName(String keyword) {
+        List<Employee> list = new ArrayList<>();
+        String sql = "SELECT id, name, salary, departmentId, status, hireDate FROM Employees WHERE name LIKE ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, "%" + keyword + "%");
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                Employee emp = new Employee(
+                list.add(new Employee(
                         rs.getInt("id"),
-                        rs.getString("fullName"),
-                        rs.getString("email"),
-                        rs.getString("phone"),
-                        rs.getString("department"),
-                        rs.getString("position"),
+                        rs.getString("name"),
                         rs.getDouble("salary"),
+                        rs.getInt("departmentId"),
                         rs.getString("status"),
-                        rs.getTimestamp("createdDate")
-                );
-                list.add(emp);
+                        rs.getDate("hireDate")
+                ));
             }
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return list;
     }
 
-    // 4️⃣ Tìm theo phòng ban
-    public List<Employee> searchByDepartment(String department) {
+    public List<Employee> searchByDepartment(int depId) {
         List<Employee> list = new ArrayList<>();
-        String sql = "SELECT * FROM Employees WHERE department = ?";
+        String sql = "SELECT id, name, salary, departmentId, status, hireDate FROM Employees WHERE departmentId = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, department);
+            ps.setInt(1, depId);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                Employee emp = new Employee(
+                list.add(new Employee(
                         rs.getInt("id"),
-                        rs.getString("fullName"),
-                        rs.getString("email"),
-                        rs.getString("phone"),
-                        rs.getString("department"),
-                        rs.getString("position"),
+                        rs.getString("name"),
                         rs.getDouble("salary"),
+                        rs.getInt("departmentId"),
                         rs.getString("status"),
-                        rs.getTimestamp("createdDate")
-                );
-                list.add(emp);
+                        rs.getDate("hireDate")
+                ));
             }
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return list;
     }
 
-    // 5️⃣ Tìm theo trạng thái
     public List<Employee> searchByStatus(String status) {
         List<Employee> list = new ArrayList<>();
-        String sql = "SELECT * FROM Employees WHERE status = ?";
+        String sql = "SELECT id, name, salary, departmentId, status, hireDate FROM Employees WHERE status = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -155,24 +200,40 @@ public class EmployeeDAO {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                Employee emp = new Employee(
+                list.add(new Employee(
                         rs.getInt("id"),
-                        rs.getString("fullName"),
-                        rs.getString("email"),
-                        rs.getString("phone"),
-                        rs.getString("department"),
-                        rs.getString("position"),
+                        rs.getString("name"),
                         rs.getDouble("salary"),
+                        rs.getInt("departmentId"),
                         rs.getString("status"),
-                        rs.getTimestamp("createdDate")
-                );
-                list.add(emp);
+                        rs.getDate("hireDate")
+                ));
             }
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return list;
+    }
+
+    // ================= MODULE 7 =================
+
+    public boolean updateStatus(int id, String status) {
+        String sql = "UPDATE Employees SET status = ? WHERE id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, status);
+            ps.setInt(2, id);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 }

@@ -4,7 +4,7 @@
  */
 package model;
 
-import java.util.Date;
+import java.sql.Date;
 
 /**
  *
@@ -14,7 +14,7 @@ public class Employee {
     private int id;
     private String name;
     private double salary;
-    private int departmentid;
+    private int departmentId;
     private String status;
     private Date hireDate;
 
@@ -25,7 +25,7 @@ public class Employee {
         this.id = id;
         this.name = name;
         this.salary = salary;
-        this.departmentid = departmentid;
+        this.departmentId = departmentid;
         this.status = status;
         this.hireDate = hireDate;
     }
@@ -54,12 +54,12 @@ public class Employee {
         this.salary = salary;
     }
 
-    public int getDepartmentid() {
-        return departmentid;
+    public int getDepartmentId() {
+        return departmentId;
     }
 
-    public void setDepartmentid(int departmentid) {
-        this.departmentid = departmentid;
+    public void setDepartmentId(int departmentid) {
+        this.departmentId = departmentid;
     }
 
     public String getStatus() {
@@ -80,6 +80,6 @@ public class Employee {
 
     @Override
     public String toString() {
-        return "Employee{" + "id=" + id + ", name=" + name + ", salary=" + salary + ", departmentid=" + departmentid + ", status=" + status + ", hireDate=" + hireDate + '}';
+        return "Employee{" + "id=" + id + ", name=" + name + ", salary=" + salary + ", departmentid=" + departmentId + ", status=" + status + ", hireDate=" + hireDate + '}';
     }
 }

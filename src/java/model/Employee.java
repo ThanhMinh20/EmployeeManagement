@@ -21,11 +21,11 @@ public class Employee {
     public Employee() {
     }
 
-    public Employee(int id, String name, double salary, int departmentId, String status, Date hireDate) {
+    public Employee(int id, String name, double salary, int departmentid, String status, Date hireDate) {
         this.id = id;
         this.name = name;
         this.salary = salary;
-        this.departmentId = departmentId;
+        this.departmentId = departmentid;
         this.status = status;
         this.hireDate = hireDate;
     }
@@ -58,8 +58,8 @@ public class Employee {
         return departmentId;
     }
 
-    public void setDepartmentId(int departmentId) {
-        this.departmentId = departmentId;
+    public void setDepartmentId(int departmentid) {
+        this.departmentId = departmentid;
     }
 
     public String getStatus() {
@@ -80,6 +80,6 @@ public class Employee {
 
     @Override
     public String toString() {
-        return "Employee{" + "id=" + id + ", name=" + name + ", salary=" + salary + ", departmentId=" + departmentId + ", status=" + status + ", hireDate=" + hireDate + '}';
+        return "Employee{" + "id=" + id + ", name=" + name + ", salary=" + salary + ", departmentid=" + departmentId + ", status=" + status + ", hireDate=" + hireDate + '}';
     }
 }

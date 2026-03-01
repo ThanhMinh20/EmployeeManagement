@@ -10,7 +10,6 @@
             <file>file:/D:/Dai_hoc/Ki_4/PRJ301/Employee_management_system/web/employees/create.jsp</file>
             <file>file:/D:/Dai_hoc/Ki_4/PRJ301/Employee_management_system/web/employees/delete.jsp</file>
             <file>file:/D:/Dai_hoc/Ki_4/PRJ301/Employee_management_system/web/employees/edit.jsp</file>
-            <file>file:/D:/Dai_hoc/Ki_4/PRJ301/Employee_management_system/src/java/filter/AuthFilter.java</file>
             <file>file:/D:/Dai_hoc/Ki_4/PRJ301/Employee_management_system/src/java/model/Employee.java</file>
             <file>file:/D:/Dai_hoc/Ki_4/PRJ301/Employee_management_system/src/java/model/User.java</file>
             <file>file:/D:/Dai_hoc/Ki_4/PRJ301/Employee_management_system/src/java/dao/DBConnection.java</file>
@@ -20,6 +19,7 @@
             <file>file:/D:/Dai_hoc/Ki_4/PRJ301/Employee_management_system/src/java/controller/LogoutServlet.java</file>
             <file>file:/D:/Dai_hoc/Ki_4/PRJ301/Employee_management_system/src/java/service/IEmployeeService.java</file>
             <file>file:/D:/Dai_hoc/Ki_4/PRJ301/Employee_management_system/src/java/service/EmployeeService.java</file>
+            <file>file:/D:/Dai_hoc/Ki_4/PRJ301/Employee_management_system/src/java/filter/AuthFilter.java</file>
         </group>
     </open-files>
 </project-private>

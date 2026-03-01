@@ -13,7 +13,7 @@ import java.util.Date;
 public class Employee {
     private int id;
     private String name;
-    private int salary;
+    private double salary;
     private int departmentid;
     private String status;
     private Date hireDate;
@@ -21,7 +21,7 @@ public class Employee {
     public Employee() {
     }
 
-    public Employee(int id, String name, int salary, int departmentid, String status, Date hireDate) {
+    public Employee(int id, String name, double salary, int departmentid, String status, Date hireDate) {
         this.id = id;
         this.name = name;
         this.salary = salary;
@@ -46,11 +46,11 @@ public class Employee {
         this.name = name;
     }
 
-    public int getSalary() {
+    public double getSalary() {
         return salary;
     }
 
-    public void setSalary(int salary) {
+    public void setSalary(double salary) {
         this.salary = salary;
     }
 

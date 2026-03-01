@@ -11,10 +11,14 @@ import model.Employee;
 public interface IEmployeeService {
 
     List<Employee> getAllEmployees();
+    List<Employee> searchByName(String keyword);
+
 
     void createEmployee(Employee e) throws Exception;
 
     void updateEmployee(Employee e) throws Exception;
+    
+    Employee getEmpById (int id) throws Exception;
 
     void deleteEmployee(int id);
 

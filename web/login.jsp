@@ -18,7 +18,7 @@
 
     <!-- HIEN THI LOI -->
     <%
-        String error = (String) request.getAttribute("ERROR");
+        String error = (String) request.getAttribute("error");
         if (error != null) {
     %>
         <p style="color:red;"><%= error %></p>
@@ -27,7 +27,7 @@
     %>
 
     <!-- FORM LOGIN -->
-    <form action="LoginServlet" method="post">
+    <form action="checkLogin" method="post">
 
         <table>
             <tr>

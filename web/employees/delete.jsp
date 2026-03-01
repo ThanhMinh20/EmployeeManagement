@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
 <head>
     <title>Xóa nhân viên</title>
@@ -10,16 +11,16 @@
     <ul>
         <li>ID: ${employee.id}</li>
         <li>Tên: ${employee.name}</li>
-        <li>Lương: ${employee.salary}</li>
+        <li>Lương: <fmt:formatNumber value="${employee.salary}" type="currency"/></li>
         <li>Phòng ban: ${employee.departmentId}</li>
         <li>Trạng thái: ${employee.status}</li>
-        <li>Ngày vào: ${employee.hireDate}</li>
+        <li>Ngày vào: <fmt:formatDate value="${employee.hireDate}" pattern="dd/MM/yyyy"/></li>
     </ul>
-    <form action="employees" method="post">
+    <form action="employee" method="post">
         <input type="hidden" name="action" value="delete">
         <input type="hidden" name="id" value="${employee.id}">
         <button type="submit">Xóa</button>
-        <a href="employees?action=list">Hủy</a>
+        <a href="employee?action=list">Hủy</a>
     </form>
 </body>
 </html>

@@ -14,13 +14,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import dao.DBConnection;
+import dao.UserDAO;
 import model.User;
 import jakarta.servlet.http.*;
 /**
  *
  * @author minht
  */
-@WebServlet("/login")
+@WebServlet("/checkLogin")
 public class LoginServlet extends HttpServlet {
 
     /**
@@ -48,60 +49,29 @@ public class LoginServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String username = request.getParameter("username");
-        String password = request.getParameter("password");
+    String password = request.getParameter("password");
 
-        User user = null;
+    // 2. Gọi DAO xử lý (Đây là cách chuyên nghiệp)
+    UserDAO dao = new UserDAO(); 
+    User user = dao.checkLogin(username, password);
 
-        String sql =
-            "SELECT userId, username, password, role "
-          + "FROM Users "
-          + "WHERE username = ? AND password = ?";
-
-        try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setString(1, username);
-            ps.setString(2, password);
-
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                user = new User(
-                        rs.getInt("userId"),
-                        rs.getString("username"),
-                        rs.getString("password"),
-                        rs.getString("role")
-                );
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    // 3. Xử lý kết quả
+    if (user != null) {
+        // Login thành công
+        HttpSession session = request.getSession(true);
+        session.setAttribute("LOGIN_USER", user);
         
-        if (user != null) {
-
-            HttpSession session = request.getSession(true);
-            session.setAttribute("LOGIN_USER", user);
-
-            // redirect theo role
-            if ("ADMIN".equalsIgnoreCase(user.getRole())) {
-                response.sendRedirect(
-                        request.getContextPath()
-                        + "/employee?action=list");
-            } else {
-                // STAFF chỉ xem list
-                response.sendRedirect(
-                        request.getContextPath()
-                        + "/employee?action=list");
-            }
-
+        // Chuyển hướng theo Role (Admin/User)
+        // Chú ý: Database của bạn để role là 'admin' (viết thường)
+        if ("admin".equalsIgnoreCase(user.getRole())) {
+            response.sendRedirect(request.getContextPath() + "/employee?action=list");
         } else {
-            // login fail
-            request.setAttribute("error",
-                    "Invalid username or password");
-
-            request.getRequestDispatcher("login.jsp")
-                   .forward(request, response);
+            response.sendRedirect(request.getContextPath() + "/employee?action=list");
         }
+    } else {
+        // Login thất bại - Dùng đúng tên attribute "error" mà JSP đang đợi
+        request.setAttribute("error", "Invalid username or password");
+        request.getRequestDispatcher("login.jsp").forward(request, response);
     }
+}
 }

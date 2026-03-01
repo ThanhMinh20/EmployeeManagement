@@ -1,13 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+//import java.text.SimpleDateFormat;
+import java.sql.Date;
 import java.util.List;
 import model.Employee;
 import service.EmployeeService;
@@ -17,19 +15,18 @@ import service.IEmployeeService;
 public class EmployeeServlet extends HttpServlet {
 
     private IEmployeeService service = new EmployeeService();
+    //private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     protected void processRequest(HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
 
         String action = request.getParameter("action");
-
         if (action == null) {
             action = "list";
         }
 
         try {
-
             switch (action) {
 
                 // ================= LIST =================
@@ -40,17 +37,55 @@ public class EmployeeServlet extends HttpServlet {
                             .forward(request, response);
                     break;
 
-                // ================= CREATE =================
+                // ================= SEARCH =================
+                case "search":
+                    String keyword = request.getParameter("keyword");
+                    List<Employee> searchResult = service.searchByName(keyword);
+                    request.setAttribute("EMP_LIST", searchResult);
+                    request.getRequestDispatcher("employees/list.jsp")
+                            .forward(request, response);
+                    break;
+
+                // ================= SHOW CREATE FORM =================
                 case "create":
-                    createEmployee(request, response);
+                    // Forward to create form
+                    request.getRequestDispatcher("employees/create.jsp")
+                            .forward(request, response);
                     break;
 
-                // ================= UPDATE =================
+                // ================= CREATE (POST) =================
+                case "insert":
+                    Employee newEmp = extractEmployeeFromRequest(request, true); // true = ignore id
+                    service.createEmployee(newEmp);
+                    response.sendRedirect("employee?action=list");
+                    break;
+
+                // ================= SHOW EDIT FORM =================
+                case "edit":
+                    int editId = Integer.parseInt(request.getParameter("id"));
+                    Employee emp = service.getEmpById(editId);
+                    request.setAttribute("employee", emp);
+                    request.getRequestDispatcher("employees/edit.jsp")
+                            .forward(request, response);
+                    break;
+
+                // ================= UPDATE (POST) =================
                 case "update":
-                    updateEmployee(request, response);
+                    Employee updateEmp = extractEmployeeFromRequest(request, false);
+                    service.updateEmployee(updateEmp);
+                    response.sendRedirect("employee?action=list");
                     break;
 
-                // ================= DELETE =================
+                // ================= SHOW DELETE CONFIRMATION =================
+                case "confirmDelete":
+                    int deleteId = Integer.parseInt(request.getParameter("id"));
+                    Employee delEmp = service.getEmpById(deleteId);
+                    request.setAttribute("employee", delEmp);
+                    request.getRequestDispatcher("employees/delete.jsp")
+                            .forward(request, response);
+                    break;
+
+                // ================= DELETE (POST) =================
                 case "delete":
                     int id = Integer.parseInt(request.getParameter("id"));
                     service.deleteEmployee(id);
@@ -59,13 +94,13 @@ public class EmployeeServlet extends HttpServlet {
 
                 // ================= CHANGE STATUS =================
                 case "changeStatus":
-                    int empId = Integer.parseInt(request.getParameter("id"));
+                    int statusId = Integer.parseInt(request.getParameter("id"));
                     String status = request.getParameter("status");
-                    service.changeStatus(empId, status);
+                    service.changeStatus(statusId, status);
                     response.sendRedirect("employee?action=list");
                     break;
 
-                // ================= MODULE 6 =================
+                // ================= MODULE 6 (temp) =================
                 case "addTemp":
                     addTempEmployee(request, response);
                     break;
@@ -79,74 +114,63 @@ public class EmployeeServlet extends HttpServlet {
             }
 
         } catch (Exception e) {
-            request.setAttribute("ERROR", e.getMessage());
+            request.setAttribute("error", e.getMessage());
+            request.setAttribute("errLocation", e.getStackTrace());
             request.getRequestDispatcher("error.jsp")
                     .forward(request, response);
         }
     }
 
-    // ================= CREATE =================
-    private void createEmployee(HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+    // ================= EXTRACT EMPLOYEE FROM REQUEST =================
+    private Employee extractEmployeeFromRequest(HttpServletRequest request, boolean isCreate)
+            throws Exception {
+        Employee e = new Employee();
 
-        Employee e = extractEmployeeFromRequest(request);
+        // ID is only present for update/delete, not for create
+        if (!isCreate) {
+            String idParam = request.getParameter("id");
+            if (idParam != null && !idParam.isEmpty()) {
+                e.setId(Integer.parseInt(idParam));
+            }
+        }
 
-        service.createEmployee(e);
+        String name = request.getParameter("name");
+        String salaryParam = request.getParameter("salary");
+        String deptParam = request.getParameter("departmentId");
+        String status = request.getParameter("status");
+        String hireDateStr = request.getParameter("hireDate");
 
-        response.sendRedirect("employee?action=list");
+        e.setName(name);
+        if (salaryParam != null && !salaryParam.isEmpty()) {
+            e.setSalary(Double.parseDouble(salaryParam));
+        }
+        if (deptParam != null && !deptParam.isEmpty()) {
+            e.setDepartmentId(Integer.parseInt(deptParam));
+        }
+        e.setStatus(status);
+
+        if (hireDateStr != null && !hireDateStr.isEmpty()) {
+            Date hireDate = Date.valueOf(hireDateStr);
+            e.setHireDate(hireDate);
+        }
+
+        return e;
     }
 
-    // ================= UPDATE =================
-    private void updateEmployee(HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-
-        Employee e = extractEmployeeFromRequest(request);
-
-        service.updateEmployee(e);
-
-        response.sendRedirect("employee?action=list");
-    }
-
-    // ================= MODULE 6 =================
+    // ================= MODULE 6 METHODS =================
     private void addTempEmployee(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-
-        Employee e = extractEmployeeFromRequest(request);
-
+        Employee e = extractEmployeeFromRequest(request, true);
         HttpSession session = request.getSession();
-
         service.addTempEmployee(session, e);
-
         response.sendRedirect("employees/tempList.jsp");
     }
 
     private void confirmInsert(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-
         HttpSession session = request.getSession();
-
         service.confirmInsert(session);
-
         response.sendRedirect("employee?action=list");
-    }
-
-    // ================= COMMON METHOD =================
-    private Employee extractEmployeeFromRequest(HttpServletRequest request) {
-
-        int id = Integer.parseInt(request.getParameter("id"));
-        String name = request.getParameter("name");
-        double salary = Double.parseDouble(request.getParameter("salary"));
-        int departmentId = Integer.parseInt(request.getParameter("departmentId"));
-        String status = request.getParameter("status");
-
-        Employee e = new Employee();
-        e.setId(id);
-        e.setName(name);
-        e.setSalary(salary);
-        e.setDepartmentId(departmentId);
-        e.setStatus(status);
-
-        return e;
     }
 
     @Override

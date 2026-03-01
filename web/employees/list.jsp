@@ -26,7 +26,7 @@
 
     <!-- Ô tìm kiếm -->
     <div class="search-box">
-        <form action="employees" method="get">
+        <form action="employee" method="get">
             <input type="hidden" name="action" value="search">
             <input type="text" name="keyword" placeholder="Tìm theo tên...">
             <button type="submit">Tìm</button>
@@ -34,8 +34,8 @@
     </div>
 
     <!-- Nút thêm mới (chỉ ADMIN) -->
-    <c:if test="${sessionScope.LOGIN_USER.role == 'ADMIN'}">
-        <a href="employees?action=createForm">Thêm nhân viên</a>
+    <c:if test="${sessionScope.LOGIN_USER.role == 'admin'}">
+        <a href="employee?action=create">Thêm nhân viên</a>
     </c:if>
 
     <table>
@@ -46,26 +46,25 @@
             <th>Phòng ban</th>
             <th>Trạng thái</th>
             <th>Ngày vào</th>
-            <c:if test="${sessionScope.LOGIN_USER.role == 'ADMIN'}">
+            <c:if test="${sessionScope.LOGIN_USER.role == 'admin'}">
                 <th>Hành động</th>
             </c:if>
         </tr>
-        <c:forEach var="emp" items="${employees}">
+        <c:forEach var="emp" items="${EMP_LIST}">
             <tr>
                 <td>${emp.id}</td>
                 <td>${emp.name}</td>
                 <td><fmt:formatNumber value="${emp.salary}" type="currency"/></td>
-                <td>${emp.departmentId}</td> <!-- Có thể hiển thị tên phòng nếu có thêm logic -->
+                <td>${emp.departmentId}</td>
                 <td>${emp.status}</td>
                 <td><fmt:formatDate value="${emp.hireDate}" pattern="dd/MM/yyyy"/></td>
-                <c:if test="${sessionScope.LOGIN_USER.role == 'ADMIN'}">
+                <c:if test="${sessionScope.LOGIN_USER.role == 'admin'}">
                     <td>
-                        <a href="employees?action=editForm&id=${emp.id}">Sửa</a> |
-                        <a href="employees?action=deleteForm&id=${emp.id}">Xóa</a> |
-                        <a href="employees?action=changeStatus&id=${emp.id}&status=PENDING">Pending</a> |
-                        <a href="employees?action=changeStatus&id=${emp.id}&status=WORKING">Working</a> |
-                        <a href="employees?action=changeStatus&id=${emp.id}&status=ACTIVE">Active</a> |
-                        <a href="employees?action=changeStatus&id=${emp.id}&status=TERMINATED">Terminated</a>
+                        <a href="employee?action=edit&id=${emp.id}">Sửa</a> |
+                        <a href="employee?action=confirmDelete&id=${emp.id}">Xóa</a> |
+                        <a href="employee?action=changeStatus&id=${emp.id}&status=PENDING">Pending</a> |
+                        <a href="employee?action=changeStatus&id=${emp.id}&status=ACTIVE">Active</a> |
+                        <a href="employee?action=changeStatus&id=${emp.id}&status=TERMINATED">Terminated</a>
                     </td>
                 </c:if>
             </tr>

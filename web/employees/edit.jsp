@@ -10,7 +10,7 @@
     <c:if test="${not empty error}">
         <p style="color:red">${error}</p>
     </c:if>
-    <form action="employees" method="post">
+    <form action="employee" method="post">
         <input type="hidden" name="action" value="update">
         <input type="hidden" name="id" value="${employee.id}">
         <label>Tên:</label> <input type="text" name="name" value="${employee.name}" required/><br/>
@@ -25,7 +25,7 @@
         <label>Ngày vào:</label>
         <input type="date" name="hireDate" value="<fmt:formatDate value='${employee.hireDate}' pattern='yyyy-MM-dd'/>" required/><br/>
         <button type="submit">Cập nhật</button>
-        <a href="employees?action=list">Hủy</a>
+        <a href="employee?action=list">Hủy</a>
     </form>
 </body>
 </html>

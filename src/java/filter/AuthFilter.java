@@ -41,13 +41,13 @@ public class AuthFilter implements Filter {
         // cac trang duoc phep vao ma khong can login
         boolean isLoginRequest = uri.endsWith("login.jsp")
                 || uri.endsWith("login")
+                || uri.endsWith("checkLogin")
                 || uri.contains("css")
-                || uri.contains("js")
-                || uri.contains("images");
+                || uri.contains("js");
 
         // lay session hien tai
         HttpSession session = req.getSession(false);
-        boolean loggedIn = (session != null && session.getAttribute("account") != null);
+        boolean loggedIn = (session != null && session.getAttribute("LOGIN_USER") != null);
 
         // neu da login hoac dang vao trang login -> cho di tiep
         if (loggedIn || isLoginRequest) {

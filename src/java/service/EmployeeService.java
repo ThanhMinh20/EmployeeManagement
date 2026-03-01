@@ -20,6 +20,11 @@ public class EmployeeService implements IEmployeeService {
     public List<Employee> getAllEmployees() {
         return dao.getAllEmployees();
     }
+    
+    public List<Employee> searchByName(String keyword)
+    {
+        return dao.searchByName(keyword);
+    }
 
     @Override
     public void createEmployee(Employee e) throws Exception {
@@ -31,6 +36,12 @@ public class EmployeeService implements IEmployeeService {
     public void updateEmployee(Employee e) throws Exception {
         validateEmployee(e);
         dao.updateEmp(e);
+    }
+    
+    @Override
+    public Employee getEmpById(int id) throws Exception
+    {
+        return dao.getEmpById(id);
     }
 
     @Override

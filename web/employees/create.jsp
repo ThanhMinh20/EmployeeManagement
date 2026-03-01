@@ -9,8 +9,8 @@
     <c:if test="${not empty error}">
         <p style="color:red">${error}</p>
     </c:if>
-    <form action="employees" method="post">
-        <input type="hidden" name="action" value="create">
+    <form action="employee" method="post">
+        <input type="hidden" name="action" value="insert">
         <label>Tên:</label> <input type="text" name="name" required/><br/>
         <label>Lương:</label> <input type="number" step="0.01" name="salary" required/><br/>
         <label>Mã phòng ban:</label> <input type="number" name="departmentId" required/><br/>
@@ -22,7 +22,7 @@
         </select><br/>
         <label>Ngày vào:</label> <input type="date" name="hireDate" required/><br/>
         <button type="submit">Lưu</button>
-        <a href="employees?action=list">Hủy</a>
+        <a href="employee?action=list">Hủy</a>
     </form>
 </body>
 </html>
